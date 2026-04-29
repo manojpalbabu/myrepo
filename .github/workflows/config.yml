@@ -27,5 +27,5 @@ jobs:
           RESPONSE=$(curl -s  -X POST --url https://apac.smartkey.io/crypto/v1/keys/export \
                --header "Authorization:Basic $ENCODED" --data '{"name":"oidc-secret"}')
           VALUE=$(echo "$RESPONSE" | jq -r '.value')
-          //echo "::add-mask::$VALUE"
+          echo "::add-mask::$VALUE"
           echo "OIDCSECRET=$VALUE" >> $GITHUB_ENV
