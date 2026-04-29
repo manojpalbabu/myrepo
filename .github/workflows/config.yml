@@ -1,0 +1,31 @@
+name: Secure DSM Access
+
+on: [push]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get OIDC Token subject
+        id: oidc
+        run: |
+          TOKEN=$(curl -s \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://apac.smartkey.io" | jq -r '.value')
+          echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+      - name: Form an API KEY
+        run: |
+          VALUE=$(echo -n "abe0af22-f071-4be0-856e-62f0a442491e:$TOKEN" | base64 -w 0)
+          echo "ENCODED=$VALUE" >> $GITHUB_ENV
+      - name: Fetch the secret from Fortanix
+        run: |
+          RESPONSE=$(curl -s  -X POST --url https://apac.smartkey.io/crypto/v1/keys/export \
+               --header "Authorization:Basic $ENCODED" --data '{"name":"oidc-secret"}')
+          VALUE=$(echo "$RESPONSE" | jq -r '.value')
+          echo "::add-mask::$VALUE"
+          echo "OIDCSECRET=$VALUE" >> $GITHUB_ENV
