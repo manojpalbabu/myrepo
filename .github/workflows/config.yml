@@ -28,5 +28,4 @@ jobs:
                --header "Authorization:Basic $ENCODED" --data '{"name":"oidc-secret"}')
           VALUE=$(echo "$RESPONSE" | jq -r '.value')
           //echo "::add-mask::$VALUE"
-          echo $VALUE
           echo "OIDCSECRET=$VALUE" >> $GITHUB_ENV
