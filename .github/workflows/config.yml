@@ -18,6 +18,7 @@ jobs:
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
             "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://apac.smartkey.io" | jq -r '.value')
           echo "TOKEN=$TOKEN" >> $GITHUB_ENV
+          echo "$TOKEN"
       - name: Form an API KEY
         run: |
           VALUE=$(echo -n "abe0af22-f071-4be0-856e-62f0a442491e:$TOKEN" | base64 -w 0)
